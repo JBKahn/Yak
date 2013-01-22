@@ -1,0 +1,29 @@
+Upon connection, the server side outputs a banner saying
+"YAK youripaddress\r\n" (e.g. if someone connects from IP address
+192.168.3.2, the banner would be "YAK 192.168.3.2\r\n")
+
+The client also immediately says "YAK youripadddress myport\r\n", telling the
+server what the server's IP address is, and what the client's own listening
+port number is.  (Note that the IP address and port number here are for
+_different_ peers -- the IP address is that of the addressee; the port number
+is that of the sender.)
+
+If we already know our IP address, verify it and it's a fatal error if it
+doesn't match ("yak" won't work if a participant has multiple IP addresses).
+If we don't know our IP address yet, store it now.
+
+Learn port numbers similarly, although a mismatched port number doesn't have
+to be a fatal error.
+
+After this initial exchange, the connection is two-way -- either side can
+transmit at any time and it no longer matters which side did the connect()
+and which side did the accept().  Each transmission is one message being
+relayed and is terminated with the network newline.
+
+The message transmission begins with a list of one or more
+semicolon-separated yakkers the message has passed through, in reverse order
+(i.e. the newest one first; this order is easiest to implement); then there
+are two semicolons; then the rest of the line is the message content
+(terminated with the network newline).  Each yakker is identified as IP
+address (written as four decimal numbers separated by periods), comma, its
+listening port number (written as a single decimal number).
